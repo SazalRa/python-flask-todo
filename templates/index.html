@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Micro-boss Dashboard</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
+    <body>   
+        <script src="" async defer></script>
+        <h1>Media MicroBoss Reporting Dashboard</h1>
+        <div class="content">
+            <form method="post">
+                <p>
+                   <b><label for="content">Todo Content</label></b> 
+                </p>
+                <p>
+                    <input type= "text" name="content" placeholder="add todo">
+                </p>
+                <p>
+                    <b><label for="degree">Degree</label></b> 
+                 </p>
+                 <p>
+                    <input type= "radio"
+                    id="degree-0"
+                    name="degree"
+                    required
+                    value="important">
+                    <label for="degree-0">Important</label>
+                </p>
+                <p>
+                    <input type= "radio"
+                    id="degree-1"
+                    name="degree"
+                    required
+                    value="unimportant">
+                    <label for="degree-0">Unimportant</label>
+                </p>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </body>
+</html>
