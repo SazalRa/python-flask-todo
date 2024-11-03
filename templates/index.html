@@ -3,7 +3,7 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+
 <html>
     <head>
         <meta charset="utf-8">
@@ -45,6 +45,18 @@
                 </p>
                 <button type="submit">Submit</button>
             </form>
+            <hr>
+            {% for todo in todos %}
+            <div class="todo">
+                <p>{{ todo["content"] }} <i>{{ todo["degree"] }}</i></p>
+                <form method="POST" action="{{ url_for('delete', id=todo['_id']) }}">
+                    <input 
+                        type="submit" 
+                        value="delete todo" 
+                        onClick="return confirm('Are you sure want to delete this entry ?')">
+                </form>
+            </div>
+            {% endfor %}
         </div>
     </body>
 </html>
