@@ -1,8 +1,12 @@
 from flask import Flask, jsonify, request, render_template, url_for, redirect
 from pymongo import MongoClient 
 from bson import SON, ObjectId
+from flask_admin import Admin
+
 
 app = Flask(__name__)
+
+admin = Admin(app, name="microblog", template_mode='bootstrap4')
 
 client = MongoClient('localhost',27017)
 
@@ -33,7 +37,7 @@ def index():
     return render_template('index.html', todos = all_todos)
 
 
-@app.post("/<id>/delete")
+@app.route("/<id>/delete", methods=["POST"])
 def delete(id):
     todos.delete_one({
         "_id": ObjectId(id)

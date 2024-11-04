@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "*"
 pymongo = "*"
+flask-admin = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 
