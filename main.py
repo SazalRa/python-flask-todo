@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template, url_for, redirect
+from flask_basicauth import BasicAuth
 #from pymongo import MongoClient 
 from flask_pymongo import PyMongo
 from bson import SON, ObjectId
@@ -21,7 +22,11 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_database"
 mongo = PyMongo(app)
 
+basic_auth = BasicAuth(app)
+
 app.config["SECRET_KEY"] = os.urandom(24)
+app.config["BASIC_AUTH_USERNAME"] = 'obscure'
+app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
 
 # Initialize Flask-Admin
 admin = Admin(app, name="MicroBoss Dashboard", template_mode='bootstrap4')
@@ -67,6 +72,7 @@ admin.add_view(MyModelView(mongo.db.todos, 'Todos'))
 
 # Define a route to ensure the app is running
 @app.route('/')
+@basic_auth.required
 def index():
     return redirect(url_for('admin.index'))
 
