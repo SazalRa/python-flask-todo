@@ -8,6 +8,8 @@ flask = "*"
 pymongo = "*"
 flask-admin = "*"
 flask-sqlalchemy = "*"
+flask-pymongo = "*"
+wtforms = "*"
 
 [dev-packages]
 
