@@ -13,12 +13,15 @@ from flask_admin import Admin
 from flask_admin.contrib.pymongo import ModelView
 from wtforms import form, fields
 from bson.objectid import ObjectId  # To work with MongoDB object IDs
+import os
 
 # Initialize Flask app
 # Initialize Flask app
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_database"
 mongo = PyMongo(app)
+
+app.config["SECRET_KEY"] = os.urandom(24)
 
 # Initialize Flask-Admin
 admin = Admin(app, name="MicroBoss Dashboard", template_mode='bootstrap4')
