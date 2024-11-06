@@ -27,6 +27,7 @@ basic_auth = BasicAuth(app)
 app.config["SECRET_KEY"] = os.urandom(24)
 app.config["BASIC_AUTH_USERNAME"] = 'obscure'
 app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
+app.config['BASIC_AUTH_FORCE'] = True
 
 # Initialize Flask-Admin
 admin = Admin(app, name="MicroBoss Dashboard", template_mode='bootstrap4')
