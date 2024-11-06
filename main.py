@@ -22,6 +22,8 @@ from flask_cors import CORS
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from google.cloud import bigquery
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Initialize Flask app
@@ -39,7 +41,7 @@ app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
 app.config['BASIC_AUTH_FORCE'] = True
 
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-
+print("ok",SERVICE_ACCOUNT_FILE)
 SCOPES = ['https://www.googleapis.com/auth/bigquery']
 
 # Authenticate using the service account file
@@ -121,15 +123,16 @@ def receive_data():
 def get_bigquery_data():
     # Example query
     query = """
-        SELECT * FROM `somoy-analytics-v4.analytics_312613195.events_20241029` LIMIT 1000
+        SELECT event_name FROM `somoy-analytics-v4.analytics_312613195.events_20241029` LIMIT 10
     """
     # Run the query
     query_job = bigquery_client.query(query)
-    
+    print(query_job)
     # Fetch results
     results = []
     for row in query_job:
-        results.append({"name": row.name, "total_number": row.total_number})
+        print(row)
+        #results.append({"name": row.name, "total_number": row.total_number})
     
     return jsonify(results)
 
