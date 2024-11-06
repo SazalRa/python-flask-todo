@@ -1,24 +1,33 @@
 from flask import Flask, jsonify, request, render_template, url_for, redirect
-from flask_basicauth import BasicAuth
-#from pymongo import MongoClient 
+
 from flask_pymongo import PyMongo
-from bson import SON, ObjectId
 from flask_admin import Admin
 from flask_admin.contrib.pymongo import ModelView
-from wtforms import form, fields
+#from pymongo import MongoClient 
+#from flask_pymongo import PyMongo
+#from bson import SON, ObjectId
+#from flask_admin import Admin
+#from flask_admin.contrib.pymongo import ModelView
+#from wtforms import form, fields
 # 
 
-from flask import Flask, redirect, url_for
-from flask_pymongo import PyMongo
-from flask_admin import Admin
-from flask_admin.contrib.pymongo import ModelView
+#from flask import Flask, redirect, url_for
+
 from wtforms import form, fields
 from bson.objectid import ObjectId  # To work with MongoDB object IDs
 import os
+from flask_basicauth import BasicAuth
+
+from flask_cors import CORS
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
+from google.cloud import bigquery
+
 
 # Initialize Flask app
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_database"
 mongo = PyMongo(app)
 
@@ -28,6 +37,20 @@ app.config["SECRET_KEY"] = os.urandom(24)
 app.config["BASIC_AUTH_USERNAME"] = 'obscure'
 app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
 app.config['BASIC_AUTH_FORCE'] = True
+
+SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+
+SCOPES = ['https://www.googleapis.com/auth/bigquery']
+
+# Authenticate using the service account file
+credentials = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+)
+
+bigquery_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+
+if not SERVICE_ACCOUNT_FILE:
+    raise ValueError("Please set the GOOGLE_APPLICATION_CREDENTIALS environment variable")
 
 # Initialize Flask-Admin
 admin = Admin(app, name="MicroBoss Dashboard", template_mode='bootstrap4')
@@ -77,5 +100,39 @@ admin.add_view(MyModelView(mongo.db.todos, 'Todos'))
 def index():
     return redirect(url_for('admin.index'))
 
+@app.route('/api/sales-data', methods=["GET"])
+def sales_data():
+    
+    data = {
+        "monthly_sales": "4561.83",
+        "daily_sales": "219.20",
+        "yearly_sales": "31065.20",
+        "currency": "USD"
+    }
+    return jsonify(data)
+
+@app.route('/api/send', methods=['POST'])
+def receive_data():
+    received = request.json
+    print("Received data:", received)
+    return jsonify({"status": "success", "data_received": received})
+
+@app.route('/biqquery-api-call')
+def get_bigquery_data():
+    # Example query
+    query = """
+        SELECT * FROM `somoy-analytics-v4.analytics_312613195.events_20241029` LIMIT 1000
+    """
+    # Run the query
+    query_job = bigquery_client.query(query)
+    
+    # Fetch results
+    results = []
+    for row in query_job:
+        results.append({"name": row.name, "total_number": row.total_number})
+    
+    return jsonify(results)
+
+
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True)
+    app.run(debug=True, threaded=True, port= 5001)
