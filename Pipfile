@@ -11,6 +11,8 @@ flask-sqlalchemy = "*"
 flask-pymongo = "*"
 wtforms = "*"
 flask-basicauth = "*"
+flask-cors = "*"
+google-cloud-bigquery = "*"
 
 [dev-packages]
 
