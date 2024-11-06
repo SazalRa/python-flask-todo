@@ -19,6 +19,9 @@ import os
 from flask_basicauth import BasicAuth
 
 from flask_cors import CORS
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
+from google.cloud import bigquery
 
 
 # Initialize Flask app
@@ -33,6 +36,20 @@ basic_auth = BasicAuth(app)
 app.config["SECRET_KEY"] = os.urandom(24)
 app.config["BASIC_AUTH_USERNAME"] = 'obscure'
 app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
+
+SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+
+SCOPES = ['https://www.googleapis.com/auth/bigquery']
+
+# Authenticate using the service account file
+credentials = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+)
+
+bigquery_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+
+if not SERVICE_ACCOUNT_FILE:
+    raise ValueError("Please set the GOOGLE_APPLICATION_CREDENTIALS environment variable")
 
 # Initialize Flask-Admin
 admin = Admin(app, name="MicroBoss Dashboard", template_mode='bootstrap4')
@@ -84,6 +101,7 @@ def index():
 
 @app.route('/api/sales-data', methods=["GET"])
 def sales_data():
+    
     data = {
         "monthly_sales": "4561.83",
         "daily_sales": "219.20",
@@ -97,6 +115,22 @@ def receive_data():
     received = request.json
     print("Received data:", received)
     return jsonify({"status": "success", "data_received": received})
+
+@app.route('/biqquery-api-call')
+def get_bigquery_data():
+    # Example query
+    query = """
+        SELECT * FROM `somoy-analytics-v4.analytics_312613195.events_20241029` LIMIT 1000
+    """
+    # Run the query
+    query_job = bigquery_client.query(query)
+    
+    # Fetch results
+    results = []
+    for row in query_job:
+        results.append({"name": row.name, "total_number": row.total_number})
+    
+    return jsonify(results)
 
 
 if __name__ == '__main__':
