@@ -18,6 +18,7 @@ google-auth-httplib2 = "*"
 google-api-python-client = "*"
 google-cloud-bigquery = "*"
 python-dotenv = "*"
+pyjwt = "*"
 
 [dev-packages]
 

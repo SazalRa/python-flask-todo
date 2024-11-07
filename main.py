@@ -3,6 +3,11 @@ from flask import Flask, jsonify, request, render_template, url_for, redirect
 from flask_pymongo import PyMongo
 from flask_admin import Admin
 from flask_admin.contrib.pymongo import ModelView
+
+import jwt
+from datetime import datetime, timedelta
+from functools import wraps
+import secrets
 #from pymongo import MongoClient 
 #from flask_pymongo import PyMongo
 #from bson import SON, ObjectId
@@ -29,25 +34,47 @@ load_dotenv()
 # Initialize Flask app
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_database"
 mongo = PyMongo(app)
 
 basic_auth = BasicAuth(app)
 
-app.config["SECRET_KEY"] = os.urandom(24)
+app.config["SECRET_KEY"] = secrets.token_urlsafe(24) #os.urandom(24)
 app.config["BASIC_AUTH_USERNAME"] = 'obscure'
 app.config["BASIC_AUTH_PASSWORD"] = 'xxxxxx'
 app.config['BASIC_AUTH_FORCE'] = True
 
 SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-print("ok",SERVICE_ACCOUNT_FILE)
+
+# CORS ALLOW INITIALIZE
+CORS_DOMAIN_ALLOW = os.getenv('CORS_DOMAIN_ALLOW')
+print(CORS_DOMAIN_ALLOW)
+CORS(app)
+
+def generate_jwt():
+    payload = {
+        "iss": "microboss",
+        "sub": "front_to_client",
+        "iat": datetime.datetime.utcnow(),
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours = 1)
+    }
+    token = jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
+    return token
+@app.route("/token", methods=['POST'])
+def get_token():
+    token = generate_jwt()
+    return jsonify({token: token}) 
+
 SCOPES = ['https://www.googleapis.com/auth/bigquery']
 
 # Authenticate using the service account file
 credentials = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
 )
+# Set up jwt token initialize
+
+
 
 bigquery_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
